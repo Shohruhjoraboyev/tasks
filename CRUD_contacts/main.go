@@ -50,7 +50,7 @@ func create() {
 	contactMem.email = email
 	contactMem.position = position
 	contacts = append(contacts, contactMem)
-	fmt.Println(len(contacts), contacts)
+	getAll()
 }
 func update() {
 	var id uint16
@@ -59,7 +59,7 @@ func update() {
 	fmt.Scanf("%d", &id)
 	fmt.Println("Enter new properties in following order: firstName, lastName, phone, email, position ")
 	fmt.Scanf("%s %s %s %s %s", &contacts[id-1].firstName, &contacts[id-1].lastName, &contacts[id-1].phone, &contacts[id-1].email, &contacts[id-1].position)
-	fmt.Println(contacts)
+	getAll()
 }
 func get() {
 	var id uint16
@@ -79,7 +79,7 @@ func delete() {
 	fmt.Scanf("%d", &id)
 	copy(contacts[id-1:], contacts[id:])
 	contacts = contacts[:len(contacts)-1]
-	fmt.Println(contacts)
+	getAll()
 }
 func defaultV() {
 
