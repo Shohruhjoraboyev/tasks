@@ -13,73 +13,95 @@ type contact struct {
 	position  string
 }
 
+var (
+	id                                          uint16
+	firstName, lastName, phone, email, position string
+)
+
 func selectMethod() {
 	fmt.Println("Enter a method name you want to use:")
 	var method string
 	fmt.Scanf("%s", &method)
 	switch method {
 	case "create", "Create":
-		create()
+		{
+
+			fmt.Println("Enter properties in following order: id, firstName, lastName, phone, email, position ")
+			fmt.Scanf("%d %s %s %s %s %s", &id, &firstName, &lastName, &phone, &email, &position)
+
+			Create(id, firstName, lastName, phone, email, position)
+		}
 	case "update", "Update":
-		update()
+		{
+			fmt.Println("Enter an id of contact you want to update:")
+			fmt.Scanf("%d", &id)
+			fmt.Println("Enter new properties in following order: firstName, lastName, phone, email, position ")
+			fmt.Scanf("%s %s %s %s %s", firstName, lastName, phone, email, position)
+
+			Update(id, firstName, lastName, phone, email, position)
+		}
 	case "get", "Get":
-		get()
+		{
+			fmt.Println("Enter an id of contact you want to see:")
+			fmt.Scanf("%d", &id)
+			fmt.Println(Get(id))
+		}
 	case "getAll", "getall", "get All", "GetAll", "Get All":
-		getAll()
+		{
+
+			c := GetAll()
+			for _, value := range c {
+				fmt.Println(value)
+			}
+		}
 	case "delete", "Delete":
-		delete()
+		{
+			fmt.Println("Enter an id of contact you want to delete:")
+			fmt.Scanf("%d", &id)
+			Delete(id)
+		}
 
 	}
 }
 
-func create() {
+func Create(id uint16, firstName string, lastName string, phone string, email string, position string) contact {
 
-	var (
-		id                                          uint16
-		firstName, lastName, phone, email, position string
-	)
-	fmt.Println("Enter properties in following order: id, firstName, lastName, phone, email, position ")
-	fmt.Scanf("%d %s %s %s %s %s", &id, &firstName, &lastName, &phone, &email, &position)
+	var ContactMem contact
+	ContactMem.id = id
+	ContactMem.firstName = firstName
+	ContactMem.lastName = lastName
+	ContactMem.phone = phone
+	ContactMem.email = email
+	ContactMem.position = position
+	contacts = append(contacts, ContactMem)
+	GetAll()
+	return ContactMem
+}
+func Update(id uint16, firstName string, lastName string, phone string, email string, position string) contact {
+	contacts[id-1].id = id
+	contacts[id-1].firstName = firstName
+	contacts[id-1].lastName = lastName
+	contacts[id-1].phone = phone
+	contacts[id-1].email = email
+	contacts[id-1].position = position
+	GetAll()
+	var updated = contact{id, firstName, lastName, phone, email, position}
+	return updated
+}
+func Get(id uint16) contact {
 
-	fmt.Println(id, firstName, lastName, phone, email, position)
-	var contactMem contact
-	contactMem.id = id
-	contactMem.firstName = firstName
-	contactMem.lastName = lastName
-	contactMem.phone = phone
-	contactMem.email = email
-	contactMem.position = position
-	contacts = append(contacts, contactMem)
-	getAll()
+	return contacts[id-1]
 }
-func update() {
-	var id uint16
+func GetAll() []contact {
 
-	fmt.Println("Enter an id of contact you want to update:")
-	fmt.Scanf("%d", &id)
-	fmt.Println("Enter new properties in following order: firstName, lastName, phone, email, position ")
-	fmt.Scanf("%s %s %s %s %s", &contacts[id-1].firstName, &contacts[id-1].lastName, &contacts[id-1].phone, &contacts[id-1].email, &contacts[id-1].position)
-	getAll()
+	return contacts
 }
-func get() {
-	var id uint16
-	fmt.Println("Enter an id of contact you want to see:")
-	fmt.Scanf("%d", &id)
-	fmt.Println(contacts[id-1])
-}
-func getAll() {
-	for _, value := range contacts {
-		fmt.Println(value)
-	}
-
-}
-func delete() {
-	var id uint16
-	fmt.Println("Enter an id of contact you want to delete:")
-	fmt.Scanf("%d", &id)
+func Delete(id uint16) []contact {
+	con := contacts[id-1 : id]
 	copy(contacts[id-1:], contacts[id:])
 	contacts = contacts[:len(contacts)-1]
-	getAll()
+	GetAll()
+	return con
 }
 func defaultV() {
 
