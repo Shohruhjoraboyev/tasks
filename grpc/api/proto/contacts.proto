@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+option go_package = "./contacts";
+
+package contacts;
+
+service ContactService {
+    rpc Read (ReadReq) returns (ReadResp){};
+    rpc Create (CreateReq) returns (CreateResp){};
+    rpc Update (UpdateReq) returns (UpdateResp){};
+    rpc Delete (DeleteReq) returns (DeleteResp){};
+}
+
+message ReadReq {
+    uint32 id = 1;
+}
+message ReadResp {
+    uint32 id = 1;
+    string firstname =2;
+    string lastname =3;
+    string phone =4;
+    string email =5;
+    string position =6;
+}
+
+message CreateReq {
+    uint32 id = 1;
+    string firstname =2;
+    string lastname =3;
+    string phone =4;
+    string email =5;
+    string position =6;
+}
+message CreateResp {
+    uint32 id = 1;
+}
+
+message UpdateReq {
+    uint32 id =1;
+    string firstname =2;
+    string lastname =3;
+    string phone =4;
+    string email =5;
+    string position =6;
+} 
+message UpdateResp {
+    uint32 id =1;
+    string firstname =2;
+    string lastname =3;
+    string phone =4;
+    string email =5;
+    string position =6; 
+}
+
+message DeleteReq {
+    uint32 id = 1;
+}
+message DeleteResp {
+    string result =2;
+}
