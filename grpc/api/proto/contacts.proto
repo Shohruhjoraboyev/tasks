@@ -56,5 +56,5 @@ message DeleteReq {
     uint32 id = 1;
 }
 message DeleteResp {
-    string result =2;
+    string result =1;
 }

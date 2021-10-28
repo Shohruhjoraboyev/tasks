@@ -19,65 +19,70 @@ type contact struct {
 var cntcts = []contact{
 	contact1,
 	contact2,
+	contact3,
 }
 var (
-	contact1           = contact{1, "Liam", "Neeson", "65454354", "liamneeson@gmail.com", "director"}
-	contact2           = contact{2, "Kurt", "Russel", "6873465457", "kurtruss@gmail.com", "programmer"}
-	testContact        = contact{3, "Tim", "Allen", "787546846", "allentim@gmail.com", "team-lead"}
-	testId      uint32 = 2
+	contact1 = contact{1, "Liam", "Neeson", "65454354", "liamneeson@gmail.com", "director"}
+	contact2 = contact{2, "Kurt", "Russel", "6873465457", "kurtruss@gmail.com", "programmer"}
+	contact3 = contact{3, "Tim", "Allen", "787546846", "allentim@gmail.com", "team-lead"}
 )
 
 type GRPCServer struct{}
 
 func (s *GRPCServer) Read(ctx context.Context, req *contacts.ReadReq) (con *contacts.ReadResp, err error) {
-	c := &contacts.ReadResp{}
-	var coun int
-	testId = c.GetId()
+	testId := req.GetId()
+	log.Println("hello")
 	for i := range cntcts {
 		if testId == cntcts[i].id {
-			c.Id = cntcts[i].id
-			c.Firstname = cntcts[i].firstName
-			c.Lastname = cntcts[i].lastName
-			c.Phone = cntcts[i].phone
-			c.Email = cntcts[i].email
-			c.Position = cntcts[i].position
-			return c, nil
-
-		} else {
-			coun++
-			if coun == len(cntcts) {
-				err = errors.New("no contact with this id")
-				return c, err
-			}
+			con = &contacts.ReadResp{}
+			con.Id = cntcts[i].id
+			con.Firstname = cntcts[i].firstName
+			con.Lastname = cntcts[i].lastName
+			con.Phone = cntcts[i].phone
+			con.Email = cntcts[i].email
+			con.Position = cntcts[i].position
+			return con, nil
 		}
 	}
-	return &contacts.ReadResp{Id: c.GetId(), Firstname: c.GetFirstname(), Lastname: c.GetLastname(), Phone: c.GetPhone(), Email: c.GetEmail(), Position: c.GetPosition()}, nil
+	if con == nil {
+		err = errors.New("no contact with this id")
+		return con, err
+	}
+	return con, nil
 }
 
+// Create
 func (s *GRPCServer) Create(ctx context.Context, req *contacts.CreateReq) (*contacts.CreateResp, error) {
-	c := &contacts.CreateResp{}
+	c := contact{}
+	c.id = req.GetId()
+
 	for i := range cntcts {
-		if testContact.id == cntcts[i].id {
+		if c.id == cntcts[i].id {
 			log.Fatal("already exsists contact with this id")
 		} else {
-			cntcts = append(cntcts, testContact)
-			c.Id = testContact.id
+			c.firstName = req.GetFirstname()
+			c.lastName = req.GetLastname()
+			c.phone = req.GetPhone()
+			c.email = req.GetEmail()
+			c.position = req.GetPosition()
+			cntcts = append(cntcts, c)
 		}
 	}
-	return &contacts.CreateResp{}, nil
+	return &contacts.CreateResp{Id: c.id}, nil
 }
 
 func (s *GRPCServer) Update(ctx context.Context, req *contacts.UpdateReq) (*contacts.UpdateResp, error) {
 	c := &contacts.UpdateResp{}
+	c.Id = req.GetId()
 	var coun int
 	for i := range cntcts {
-		if testId == cntcts[i].id {
+		if c.Id == cntcts[i].id {
 			log.Println(cntcts[i])
-			cntcts[i].firstName = testContact.firstName
-			cntcts[i].lastName = testContact.lastName
-			cntcts[i].phone = testContact.phone
-			cntcts[i].email = testContact.email
-			cntcts[i].position = testContact.position
+			cntcts[i].firstName = req.GetFirstname()
+			cntcts[i].lastName = req.GetLastname()
+			cntcts[i].phone = req.GetPhone()
+			cntcts[i].email = req.GetEmail()
+			cntcts[i].position = req.GetPosition()
 
 			c.Id = cntcts[i].id
 			c.Firstname = cntcts[i].firstName
@@ -98,6 +103,7 @@ func (s *GRPCServer) Update(ctx context.Context, req *contacts.UpdateReq) (*cont
 
 func (s *GRPCServer) Delete(ctx context.Context, req *contacts.DeleteReq) (*contacts.DeleteResp, error) {
 	c := &contacts.DeleteResp{}
+	testId := req.GetId()
 	var coun int
 	for i := range cntcts {
 		if testId == cntcts[i].id {
@@ -120,5 +126,5 @@ func (s *GRPCServer) Delete(ctx context.Context, req *contacts.DeleteReq) (*cont
 			}
 		}
 	}
-	return &contacts.DeleteResp{}, nil
+	return c, nil
 }
