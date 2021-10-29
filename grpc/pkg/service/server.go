@@ -48,17 +48,17 @@ func (s *GRPCServer) Read(ctx context.Context, req *contacts.ReadReq) (con *cont
 		err = errors.New("no contact with this id")
 		return con, err
 	}
-	return con, nil
+	return con, err
 }
 
 // Create
-func (s *GRPCServer) Create(ctx context.Context, req *contacts.CreateReq) (*contacts.CreateResp, error) {
+func (s *GRPCServer) Create(ctx context.Context, req *contacts.CreateReq) (con *contacts.CreateResp, err error) {
 	c := contact{}
 	c.id = req.GetId()
 
 	for i := range cntcts {
 		if c.id == cntcts[i].id {
-			log.Fatal("already exsists contact with this id")
+			err = errors.New("already exsists contact with this id")
 		} else {
 			c.firstName = req.GetFirstname()
 			c.lastName = req.GetLastname()
@@ -68,15 +68,15 @@ func (s *GRPCServer) Create(ctx context.Context, req *contacts.CreateReq) (*cont
 			cntcts = append(cntcts, c)
 		}
 	}
-	return &contacts.CreateResp{Id: c.id}, nil
+	return &contacts.CreateResp{Id: c.id}, err
 }
 
-func (s *GRPCServer) Update(ctx context.Context, req *contacts.UpdateReq) (*contacts.UpdateResp, error) {
-	c := &contacts.UpdateResp{}
-	c.Id = req.GetId()
+func (s *GRPCServer) Update(ctx context.Context, req *contacts.UpdateReq) (con *contacts.UpdateResp, err error) {
+	con = &contacts.UpdateResp{}
+	con.Id = req.GetId()
 	var coun int
 	for i := range cntcts {
-		if c.Id == cntcts[i].id {
+		if con.Id == cntcts[i].id {
 			log.Println(cntcts[i])
 			cntcts[i].firstName = req.GetFirstname()
 			cntcts[i].lastName = req.GetLastname()
@@ -84,47 +84,62 @@ func (s *GRPCServer) Update(ctx context.Context, req *contacts.UpdateReq) (*cont
 			cntcts[i].email = req.GetEmail()
 			cntcts[i].position = req.GetPosition()
 
-			c.Id = cntcts[i].id
-			c.Firstname = cntcts[i].firstName
-			c.Lastname = cntcts[i].lastName
-			c.Phone = cntcts[i].phone
-			c.Email = cntcts[i].email
-			c.Position = cntcts[i].position
+			con.Id = cntcts[i].id
+			con.Firstname = cntcts[i].firstName
+			con.Lastname = cntcts[i].lastName
+			con.Phone = cntcts[i].phone
+			con.Email = cntcts[i].email
+			con.Position = cntcts[i].position
 		} else {
 			coun++
 			if coun == len(cntcts) {
-				log.Fatal("no contact with this id")
+				err = errors.New("no contact with this id")
 			}
 		}
 	}
 
-	return &contacts.UpdateResp{}, nil
+	return &contacts.UpdateResp{}, err
 }
 
-func (s *GRPCServer) Delete(ctx context.Context, req *contacts.DeleteReq) (*contacts.DeleteResp, error) {
-	c := &contacts.DeleteResp{}
+func (s *GRPCServer) Delete(ctx context.Context, req *contacts.DeleteReq) (con *contacts.DeleteResp, err error) {
+	con = &contacts.DeleteResp{}
 	testId := req.GetId()
 	var coun int
 	for i := range cntcts {
-		if testId == cntcts[i].id {
-			copy(cntcts[testId-1:], cntcts[testId:])
-			cntcts = cntcts[:len(cntcts)-1]
+		if testId != cntcts[len(cntcts)-1].id {
+			if testId == cntcts[i].id {
+				copy(cntcts[i:], cntcts[i+1:])
+				cntcts = cntcts[:len(cntcts)-1]
+				break
+			} else {
+				coun++
+				if coun == len(cntcts) {
+					log.Fatal("no contact with this id")
+				}
+			}
+		} else {
+			if testId == cntcts[i].id {
+				cntcts = cntcts[:len(cntcts)-1]
+				break
+			} else {
+				coun++
+				if coun == len(cntcts) {
+					err = errors.New("no contact with this id")
+				}
+			}
+
+		}
+
+	}
+	for j := range cntcts {
+		if testId == cntcts[j].id {
+			err = errors.New("not deleted")
 		} else {
 			coun++
 			if coun == len(cntcts) {
-				log.Fatal("no contact with this id")
+				con.Result = "deleted succesfully"
 			}
 		}
 	}
-	for i := range cntcts {
-		if testId == cntcts[i].id {
-			log.Fatal("not deleted")
-		} else {
-			coun++
-			if coun == len(cntcts) {
-				c.Result = "deleted succesfully"
-			}
-		}
-	}
-	return c, nil
+	return con, err
 }
