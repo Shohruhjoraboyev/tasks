@@ -1,0 +1,6 @@
+version: "3.0"
+services:
+  fibonacci:
+    image: "fibonacci"
+  odd-even:
+    image: "odd-even"
