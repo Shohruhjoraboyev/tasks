@@ -1,0 +1,35 @@
+basePath: /
+definitions:
+  models.HTTPError:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: status bad request
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API server for bot sends messages
+  title: Send Messages Bot
+  version: "1.0"
+paths:
+  /sendMessage:
+    post:
+      consumes:
+      - application/json
+      description: Send all messages
+      operationId: send-message
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+      summary: SendMessages
+swagger: "2.0"
