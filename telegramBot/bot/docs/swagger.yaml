@@ -1,5 +1,12 @@
 basePath: /
 definitions:
+  handler.message:
+    properties:
+      priority:
+        type: string
+      text:
+        type: string
+    type: object
   models.HTTPError:
     properties:
       code:
@@ -16,12 +23,21 @@ info:
   title: Send Messages Bot
   version: "1.0"
 paths:
-  /sendMessage:
+  /send:
     post:
       consumes:
       - application/json
       description: Send all messages
       operationId: send-message
+      parameters:
+      - description: new message
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/handler.message'
+      produces:
+      - application/json
       responses:
         "200":
           description: OK

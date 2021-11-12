@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package senderBot;
+
+option go_package = "./sender";
+
+
+service Send {
+    rpc SendMsg(SendReq) returns (SendResp){}
+  
+}
+
+message SendReq {
+    string text = 1;
+    string Priority =2;
+}
+message SendResp {
+    string status = 1;
+}

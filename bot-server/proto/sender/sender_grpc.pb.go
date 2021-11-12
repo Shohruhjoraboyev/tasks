@@ -19,7 +19,6 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SendClient interface {
 	SendMsg(ctx context.Context, in *SendReq, opts ...grpc.CallOption) (*SendResp, error)
-	GetMsgs(ctx context.Context, in *GetReq, opts ...grpc.CallOption) (*GetResp, error)
 }
 
 type sendClient struct {
@@ -39,21 +38,12 @@ func (c *sendClient) SendMsg(ctx context.Context, in *SendReq, opts ...grpc.Call
 	return out, nil
 }
 
-func (c *sendClient) GetMsgs(ctx context.Context, in *GetReq, opts ...grpc.CallOption) (*GetResp, error) {
-	out := new(GetResp)
-	err := c.cc.Invoke(ctx, "/senderBot.Send/GetMsgs", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // SendServer is the server API for Send service.
 // All implementations must embed UnimplementedSendServer
 // for forward compatibility
 type SendServer interface {
 	SendMsg(context.Context, *SendReq) (*SendResp, error)
-	GetMsgs(context.Context, *GetReq) (*GetResp, error)
+	mustEmbedUnimplementedSendServer()
 }
 
 // UnimplementedSendServer must be embedded to have forward compatible implementations.
@@ -62,9 +52,6 @@ type UnimplementedSendServer struct {
 
 func (UnimplementedSendServer) SendMsg(context.Context, *SendReq) (*SendResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendMsg not implemented")
-}
-func (UnimplementedSendServer) GetMsgs(context.Context, *GetReq) (*GetResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetMsgs not implemented")
 }
 func (UnimplementedSendServer) mustEmbedUnimplementedSendServer() {}
 
@@ -97,24 +84,6 @@ func _Send_SendMsg_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Send_GetMsgs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SendServer).GetMsgs(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/senderBot.Send/GetMsgs",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SendServer).GetMsgs(ctx, req.(*GetReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Send_ServiceDesc is the grpc.ServiceDesc for Send service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -125,10 +94,6 @@ var Send_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendMsg",
 			Handler:    _Send_SendMsg_Handler,
-		},
-		{
-			MethodName: "GetMsgs",
-			Handler:    _Send_GetMsgs_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -23,14 +23,28 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/sendMessage": {
+        "/send": {
             "post": {
                 "description": "Send all messages",
                 "consumes": [
                     "application/json"
                 ],
+                "produces": [
+                    "application/json"
+                ],
                 "summary": "SendMessages",
                 "operationId": "send-message",
+                "parameters": [
+                    {
+                        "description": "new message",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.message"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -49,6 +63,17 @@ var doc = `{
         }
     },
     "definitions": {
+        "handler.message": {
+            "type": "object",
+            "properties": {
+                "priority": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
         "models.HTTPError": {
             "type": "object",
             "properties": {
