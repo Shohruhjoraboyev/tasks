@@ -27,8 +27,8 @@ func (s *Server) SendMsg(ctx context.Context, req *sender.SendReq) (*sender.Send
 	now = time.Now().Unix()
 	timeout = time.Now().Unix() - lastExec
 	newMsg = message{
-		Text:     req.Text,
-		Priority: req.Priority,
+		Text:     req.GetText(),
+		Priority: req.GetPriority(),
 	}
 	msg := SortByPriority(newMsg)
 	log.Println(msg)
